@@ -1,0 +1,90 @@
+import tkinter as tk
+import subprocess
+import pyautogui
+import os
+import time
+import sys
+
+def open_browser(url):
+    """ Открывает браузер по заданному URL. """
+    try:
+        subprocess.run(["vivaldi", url])
+    except Exception as e:
+        print(f"Ошибка при открытии браузера: {e}")
+
+def find_and_click_button(button_path):
+    """ Ищет и нажимает кнопку на экране. """
+    try:
+        button_location = pyautogui.locateOnScreen(button_path, confidence=0.9)
+        if button_location:
+            x, y = pyautogui.center(button_location)
+            pyautogui.moveTo(x, y, duration=0.5)
+            pyautogui.click()
+        else:
+            print("Button not found on the screen.")
+    except Exception as e:
+        print(f"Ошибка при поиске кнопки: {e}")
+
+def scroll_page():
+    """ Прокрутка страницы. """
+    time.sleep(0.5)
+    pyautogui.press('up')
+    time.sleep(0.5)
+    pyautogui.press('up')
+
+def delay_action(delay):
+    """ Выполняет задержку. """
+    time.sleep(float(delay))
+
+def find_etymology(root, word_entry, base_path, delay_time):
+    """Ищет этимологию заданного слова."""
+    word = word_entry.get()
+    if word:
+        search_query = f"этимология слова {word}"
+        open_browser(f"https://www.google.com/search?q={search_query}")
+        
+        delay_action(delay_time)
+        find_and_click_button(os.path.join(base_path, "wiktionary.png"))
+        
+        delay_action(5)
+        
+        # Проверяем, есть ли кнопка "Русский.png" на экране
+        russian_button_path = os.path.join(base_path, "Русский.png")
+        try:
+            if pyautogui.locateOnScreen(russian_button_path, confidence=0.9):
+                find_and_click_button(os.path.join(base_path, "Русский.png"))
+                delay_action(5)
+                
+                find_and_click_button(os.path.join(base_path, "Этимология.png"))
+        except pyautogui.ImageNotFoundException:
+            find_and_click_button(os.path.join(base_path, "Меню.png"))
+            delay_action(5)
+            
+            find_and_click_button(os.path.join(base_path, "Русский.png"))
+            delay_action(5)
+            
+            find_and_click_button(os.path.join(base_path, "Этимология.png"))
+            pass
+        
+        scroll_page()
+            
+        root.destroy()
+
+# Инициализация параметров
+base_path = "/home/pefbrute/Pictures/Этимология Слов"
+delay_time = sys.argv[1] if len(sys.argv) > 1 else "3.5"
+
+# Создание интерфейса
+root = tk.Tk()
+root.title("Поиск этимологии слова")
+
+tk.Label(root, text="Введите слово:").pack()
+word_entry = tk.Entry(root)
+word_entry.pack()
+word_entry.focus()
+word_entry.bind("<Return>", lambda event: find_etymology(root, word_entry, base_path, delay_time))
+
+search_button = tk.Button(root, text="Найти этимологию", command=lambda: find_etymology(root, word_entry, base_path, delay_time))
+search_button.pack()
+
+root.mainloop()
