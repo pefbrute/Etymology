@@ -1,6 +1,6 @@
 import subprocess
 
-python_script_path = "/home/pefbrute/.config/autokey/data/My\ Phrases/Скрипты\ и\ прочее1/Сложные\ Скрипты\ Запуск\ через\ subprocess/Этимология/С\ передачей\ аргументов\ через\ консоль1/Выполнение\ Программы\ с\ принятием\ аргумента.py"
+python_script_path = "main\ program.py"
 python_command = "python3"
 delay_time = "6.5"  # Пример времени задержки в секундах
 
